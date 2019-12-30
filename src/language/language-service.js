@@ -28,6 +28,18 @@ const LanguageService = {
       )
       .where({ language_id })
   },
+  getNextWord(db, language_id, user_id){
+    return db       
+      .select(
+      'original as nextWord',
+      'total_score as totalScore',
+      'correct_count as wordCorrectCount',
+      'incorrect_count as wordIncorrectCount'
+      )
+      .from('word')
+      .join('language', `word.language_id` , '=', `language.user_id`)
+      .where({language_id: user_id})
+  }
 }
 
 module.exports = LanguageService

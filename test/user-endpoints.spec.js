@@ -183,6 +183,7 @@ describe('User Endpoints', function () {
             { original: 'pollo', translation: 'chicken' },
             { original: 'escritorio', translation: 'desk' },
             { original: 'capucha', translation: 'hoodie' },
+            { original: 'cerveza', translation: 'beer' },
             { original: 'pescado', translation: 'fish' },
           ]
         }
