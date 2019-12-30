@@ -62,32 +62,27 @@ languageRouter
 
 
 
-
+// using word_id: 18, hoodie, capucha as test input
 languageRouter
   .post('/guess',jsonBodyParser, async (req, res, next) => {
-      function displayList(list){
-        let currNode = list.head;
-        while (currNode !== null) {
-            console.log(currNode.value.translation);
-            currNode = currNode.next;
-        }
-    }
     // Expect in req.body "Guess" and "word ID"
     //Verifies that there is a guess in the request body
     if(!req.body.guess){
       res.status(400).json({ error: `Missing 'guess' in request body`}).end() 
     }
-    else if(req.body.guess){
+    else if(req.body.guess && req.body.word_id){
       try {
         const listItems = await LanguageService.getLanguageWords(
         req.app.get('db'),
         req.language.id,
       )
-      let listOfWords = new LinkedList();
-      for(let i = 1; i < listItems.length + 1; i++){
-          listOfWords.insertFirst(listItems[i]);
+      let listOfWords = new LinkedList.LinkedList();
+      for(let i = 0; i < listItems.length; i++){
       }
       // find in the linked list (word ID)
+      //LinkedList.displayList(listOfWords)
+      console.log(req.body);
+      console.log(listOfWords.find('translation', req.body.translation));
       // Compare that word Id's translation to req.body.guess
       // update correct and incorrect
       // update total

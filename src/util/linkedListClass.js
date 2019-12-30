@@ -104,14 +104,17 @@ class LinkedList {
         }
         previousNode.next = currNode.next;
     }
-    find(item) { //get
+    find(key, value) { //get
         //start at the head
+        console.log(key, value);
+
         let currNode = this.head;
         //if the list is empty
         if (!this.head){
             return null;
         }
-        while(currNode.value !== item) {
+        while(currNode.value[key].toString() !== value.toString()) {
+            console.log(currNode.id);
             //return null if end of the list 
             // and the item is not on the list
             if (currNode.next === null) {
@@ -123,7 +126,7 @@ class LinkedList {
             }
         }
         //found it
-        return currNode;
+        return currNode.value;
     }
 }
 
@@ -179,4 +182,10 @@ function findLast(lst){
       return tempNode;
 }
 
-module.exports = LinkedList, displayList, findLast, findPrevious,isEmpty, size ;
+module.exports = {
+    LinkedList, 
+    displayList, 
+    findLast, 
+    findPrevious,
+    isEmpty, 
+    size} ;
