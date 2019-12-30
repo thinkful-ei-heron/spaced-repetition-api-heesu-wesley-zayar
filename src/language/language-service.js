@@ -28,17 +28,17 @@ const LanguageService = {
       )
       .where({ language_id })
   },
-  getNextWord(db, language_id){
-    return db 
-      .from('word')
-      .join('language', 'word.language_id', '=', 'user_id')
+  getNextWord(db, language_id, user_id){
+    return db       
       .select(
-        original,
-        total_score,
-        correct_count,
-        incorrect_count 
+      'original as nextWord',
+      'total_score as totalScore',
+      'correct_count as wordCorrectCount',
+      'incorrect_count as wordIncorrectCount'
       )
-      .where({ language_id })
+      .from('word')
+      .join('language', `word.language_id` , '=', `language.user_id`)
+      .where({language_id: user_id})
   }
 }
 

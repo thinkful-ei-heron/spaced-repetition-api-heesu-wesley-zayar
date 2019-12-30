@@ -26,13 +26,31 @@ languageRouter
   })
 
   languageRouter
+  .get('/', async (req, res, next) => {
+    try {
+      const words = await LanguageService.getLanguageWords(
+        req.app.get('db'),
+        req.language.id,
+      )
+      res.json({
+        language: req.language,
+        words,
+      })
+      next()
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  languageRouter
     .get('/head', async (req, res, next) => {
       try {
         const response = await LanguageService.getNextWord(
           req.app.get('db'),
           req.language.id,
+          req.user.id,
         )
-        res.status(201).json(response)
+        res.json(response[0])
         next()
       } catch(error) {
         console.log('catch')
@@ -40,22 +58,7 @@ languageRouter
       }
   })
 
-// languageRouter
-//   .get('/', async (req, res, next) => {
-//     try {
-//       const words = await LanguageService.getLanguageWords(
-//         req.app.get('db'),
-//         req.language.id,
-//       )
-//       res.json({
-//         language: req.language,
-//         words,
-//       })
-//       next()
-//     } catch (error) {
-//       next(error)
-//     }
-//   })
+
 
 
 languageRouter
