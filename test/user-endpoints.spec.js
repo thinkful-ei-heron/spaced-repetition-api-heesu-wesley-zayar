@@ -138,7 +138,7 @@ describe('User Endpoints', function () {
           })
       })
 
-      it(`stores the new user in db with bcryped password`, () => {
+      it(`stores the new user in db with bcrypted password`, () => {
         const newUser = {
           username: 'test username',
           password: '11AAaa!!',
@@ -172,17 +172,18 @@ describe('User Endpoints', function () {
           name: 'test name',
         }
         const expectedList = {
-          name: 'French',
+          name: 'Spanish',
           total_score: 0,
           words: [
-            { original: 'entraine toi', translation: 'practice' },
-            { original: 'bonjour', translation: 'hello' },
-            { original: 'maison', translation: 'house' },
-            { original: 'développeur', translation: 'developer' },
-            { original: 'traduire', translation: 'translate' },
-            { original: 'incroyable', translation: 'amazing' },
-            { original: 'chien', translation: 'dog' },
-            { original: 'chat', translation: 'cat' },
+            { original: 'sandía', translation: 'watermelon' },
+            { original: 'comida', translation: 'meal' },
+            { original: 'agua', translation: 'water' },
+            { original: 'lentes', translation: 'glasses' },
+            { original: 'cafè', translation: 'coffee' },
+            { original: 'pollo', translation: 'chicken' },
+            { original: 'escritorio', translation: 'desk' },
+            { original: 'capucha', translation: 'hoodie' },
+            { original: 'pescado', translation: 'fish' },
           ]
         }
         return supertest(app)
