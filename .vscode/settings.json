@@ -1,0 +1,69 @@
+{
+  "sqltools.connections": [
+    {
+      "database": "blogful",
+      "dialect": "PostgreSQL",
+      "name": "1",
+      "password": "psroiabn",
+      "port": 5432,
+      "server": "localhost",
+      "username": "zayar"
+    },
+    {
+      "database": "blogful-test",
+      "dialect": "PostgreSQL",
+      "name": "test",
+      "password": "psroiabn",
+      "port": 5432,
+      "server": "localhost",
+      "username": "zayar"
+    },
+    {
+      "database": "thingful",
+      "dialect": "PostgreSQL",
+      "name": "thingful",
+      "password": "psroiabn",
+      "port": 5432,
+      "server": "localhost",
+      "username": "zayar"
+    },
+    {
+      "database": "thingful-test",
+      "dialect": "PostgreSQL",
+      "name": "thingful-test",
+      "password": "psroiabn",
+      "port": 5432,
+      "server": "localhost",
+      "username": "zayar"
+    },
+    {
+      "database": "visiri",
+      "dialect": "PostgreSQL",
+      "name": "visiri",
+      "password": "psroiabn",
+      "port": 5432,
+      "server": "localhost",
+      "username": "zayar"
+    },
+    {
+      "database": "visiri-test",
+      "dialect": "PostgreSQL",
+      "name": "visiri-test",
+      "password": "psroiabn",
+      "port": 5432,
+      "server": "localhost",
+      "username": "zayar"
+    },
+    {
+      "database": "spaced-repetition",
+      "dialect": "PostgreSQL",
+      "isActive": true,
+      "isConnected": true,
+      "name": "spaced-repetition",
+      "password": "psroiabn",
+      "port": 5432,
+      "server": "localhost",
+      "username": "zayar"
+    }
+  ]
+}
