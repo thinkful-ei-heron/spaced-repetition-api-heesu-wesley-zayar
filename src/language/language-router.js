@@ -50,10 +50,10 @@ languageRouter
           req.language.id,
           req.user.id,
         )
+        res.status(200)
         res.json(response[0])
-        next()
       } catch(error) {
-        console.log('catch')
+        console.log('caught error')
         next(error)
       }
   })
