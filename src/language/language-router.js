@@ -25,29 +25,38 @@ languageRouter
     }
   })
 
-languageRouter
-  .get('/', async (req, res, next) => {
-    try {
-      const words = await LanguageService.getLanguageWords(
-        req.app.get('db'),
-        req.language.id,
-      )
-
-      res.json({
-        language: req.language,
-        words,
-      })
-      next()
-    } catch (error) {
-      next(error)
-    }
+  languageRouter
+    .get('/head', async (req, res, next) => {
+      try {
+        const response = await LanguageService.getNextWord(
+          req.app.get('db'),
+          req.language.id,
+        )
+        res.status(201).json(response)
+        next()
+      } catch(error) {
+        console.log('catch')
+        next(error)
+      }
   })
 
-languageRouter
-  .get('/head', async (req, res, next) => {
-    // implement me
-    res.send('implement me!')
-  })
+// languageRouter
+//   .get('/', async (req, res, next) => {
+//     try {
+//       const words = await LanguageService.getLanguageWords(
+//         req.app.get('db'),
+//         req.language.id,
+//       )
+//       res.json({
+//         language: req.language,
+//         words,
+//       })
+//       next()
+//     } catch (error) {
+//       next(error)
+//     }
+//   })
+
 
 languageRouter
   .post('/guess', async (req, res, next) => {
