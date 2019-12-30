@@ -22,6 +22,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/language', languageRouter)
 app.use('/api/user', userRouter)
 app.use('/api/language/head', languageRouter)
+app.use('/api/language/guess', languageRouter)
 
 app.use(errorHandler)
 
