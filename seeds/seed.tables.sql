@@ -31,7 +31,8 @@ VALUES
   (6, 1, 'pollo', 'chicken', 7),
   (7, 1, 'escritorio', 'desk', 8),
   (8, 1, 'capucha', 'hoodie', 9),
-  (9, 1, 'pescado', 'fish', null);
+  (9, 1, 'cerveza', 'beer', 10),
+  (10, 1, 'pescado', 'fish', null);
 
 UPDATE "language" SET head = 1 WHERE id = 1;
 
