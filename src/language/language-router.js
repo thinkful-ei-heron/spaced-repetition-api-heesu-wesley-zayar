@@ -67,6 +67,7 @@ languageRouter
     if(!req.body.word_id){
       res.status(400).json({ error: `Missing 'word_id' in request body` }).end()
     }
+
     else if (req.body.guess && req.body.word_id) {
       try {
         const wordToCheck = await LanguageService.getWordById(
@@ -95,16 +96,25 @@ languageRouter
           )
           let correctCount = getCorrectCount.correct_count;
           let incorrectCount = getCorrectCount.incorrect_count;
-          // {
-          //   "nextWord": "test-next-word-from-correct-guess",
-          //   "wordCorrectCount": 111,
-          //   "wordIncorrectCount": 222,
-          //   "totalScore": 333,
-          //   "answer": "test-answer-from-correct-guess",
-          //   "isCorrect": true
-          // }
+
+
+          const changeHead = await LanguageService.changeHeadToNext(
+            req.app.get('db'),
+            wordToCheck.next,
+            req.user.id
+          )
+          const updatedHead = await LanguageService.getWordAtHead(
+            req.app.get('db'),
+            req.user.id
+          )
+            console.log(updatedHead);
+
+
+            // head = wordById next
+
+
           let outputCorrectGuess = {
-            'nextWord': null,
+            'nextWord': updatedHead.nextWord,
             'wordCorrectCount': correctCount,
             'incorrectCount': incorrectCount,
             'totalScore': totalScore,
