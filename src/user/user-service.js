@@ -66,6 +66,7 @@ const UserService = {
         ['pollo', 'chicken', 7],
         ['escritorio', 'desk', 8],
         ['capucha', 'hoodie', 9],
+        ['cerveza', 'beer', 10],
         ['pescado', 'fish', null],
       ]
       const [languageHeadId] = await trx
