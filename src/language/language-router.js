@@ -137,9 +137,12 @@ languageRouter
           let totalScore = getTotalScore.total_score;
 
           let outputIncorrectGuess = {
+            'nextWord': null,
+            'wordCorrectCount': correctCount,
+            'incorrectCount': incorrectCount,
             'totalScore': totalScore,
-            'correctCount': correctCount,
-            'incorrectCount': incorrectCount
+            'answer': wordToCheck.translation,
+            'isCorrect': false
           }
           res.status(200)
           res.json(outputIncorrectGuess)
