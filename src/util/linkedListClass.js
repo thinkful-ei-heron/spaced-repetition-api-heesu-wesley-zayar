@@ -106,15 +106,12 @@ class LinkedList {
     }
     find(key, value) { //get
         //start at the head
-        console.log(key, value);
-
         let currNode = this.head;
         //if the list is empty
         if (!this.head){
             return null;
         }
         while(currNode.value[key].toString() !== value.toString()) {
-            console.log(currNode.id);
             //return null if end of the list 
             // and the item is not on the list
             if (currNode.next === null) {

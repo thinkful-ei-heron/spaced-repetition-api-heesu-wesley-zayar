@@ -39,6 +39,16 @@ const LanguageService = {
       .from('word')
       .join('language', `word.language_id` , '=', `language.user_id`)
       .where({language_id: user_id})
+  },
+  // This is supposed to update the Users Total Score 
+  // TODO:  id is being hard coded. Find a way to make that flexible
+  updateTotalScoreCorrect(db, word_id){
+    return db.raw(`UPDATE language SET total_score = total_score + 1 WHERE id = 3;`)
+  },
+  // Updating the correct count on the words table
+  //TODO id is still hardcoded
+  updateCorrectCount(db){
+    return db.raw(`UPDATE word SET correct_count = correct_count + 1 , memory_value = memory_value + memory_value WHERE id = 3;`)
   }
 }
 
