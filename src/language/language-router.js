@@ -64,6 +64,9 @@ languageRouter
     if (!req.body.guess) {
       res.status(400).json({ error: `Missing 'guess' in request body` }).end()
     }
+    if(!req.body.word_id){
+      res.status(400).json({ error: `Missing 'word_id' in request body` }).end()
+    }
     else if (req.body.guess && req.body.word_id) {
       try {
         const wordToCheck = await LanguageService.getWordById(
@@ -92,14 +95,26 @@ languageRouter
           )
           let correctCount = getCorrectCount.correct_count;
           let incorrectCount = getCorrectCount.incorrect_count;
-          let output = {
+          // {
+          //   "nextWord": "test-next-word-from-correct-guess",
+          //   "wordCorrectCount": 111,
+          //   "wordIncorrectCount": 222,
+          //   "totalScore": 333,
+          //   "answer": "test-answer-from-correct-guess",
+          //   "isCorrect": true
+          // }
+          let outputCorrectGuess = {
+            'nextWord': null,
+            'wordCorrectCount': correctCount,
+            'incorrectCount': incorrectCount,
             'totalScore': totalScore,
-            'correctCount': correctCount,
-            'incorrectCount': incorrectCount
+            'answer': wordToCheck.translation,
+            'isCorrect': true
           }
           res.status(200)
-          res.json(output)
+          res.json(outputCorrectGuess)
         }
+        //Actions to take on an Incorrect guess
         else if (wordToCheck.translation !== req.body.guess.toLowerCase()) {
           const inCorrectTotalScore = await LanguageService.updateTotalScoreIncorrect(
             req.app.get('db'),
@@ -109,9 +124,25 @@ languageRouter
             req.app.get('db'),
             req.body.word_id
           )
-          
+          const getTotalScore = await LanguageService.getTotalScoreById(
+            req.app.get('db'),
+            req.user.id
+          )
+          const getCorrectCount = await LanguageService.getCorrectCountById(
+            req.app.get('db'),
+            req.body.word_id
+          )
+          let correctCount = getCorrectCount.correct_count;
+          let incorrectCount = getCorrectCount.incorrect_count;
+          let totalScore = getTotalScore.total_score;
+
+          let outputIncorrectGuess = {
+            'totalScore': totalScore,
+            'correctCount': correctCount,
+            'incorrectCount': incorrectCount
+          }
           res.status(200)
-          res.json({ message: 'this is Incorrect' })
+          res.json(outputIncorrectGuess)
         }
       } catch (error) {
         next(error)
