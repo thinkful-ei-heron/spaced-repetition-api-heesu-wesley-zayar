@@ -44,6 +44,17 @@ const LanguageService = {
         .where({language_id: user_id, 'word.id': head})
         .first()
     },
+      getWordById(db,word_id){
+        return db
+          .select(
+            'id',
+            'original',
+            'translation'
+          )
+          .from('word')
+          .where({id: word_id})
+          .first()
+      },
 
   // This is supposed to update the Users Total Score 
   updateTotalScoreCorrect(db, language_id){
@@ -58,6 +69,14 @@ const LanguageService = {
   },
   updateIncorrectCount(db, word_id){
     return db.raw(`UPDATE word SET incorrect_count = incorrect_count + 1 , memory_value = 1 WHERE id = ?`,[word_id])
+  },
+  getTotalScoreById(db,user_id){
+    return db
+      .select('total_score').from('language').where({'user_id': user_id}).first()
+  },
+  getCorrectCountById(db,word_id){
+    return db
+      .select('correct_count', 'incorrect_count').from('word').where({'id': word_id}).first()
   },
 }
 
