@@ -49,7 +49,8 @@ const LanguageService = {
           .select(
             'id',
             'original',
-            'translation'
+            'translation',
+            'next'
           )
           .from('word')
           .where({id: word_id})
@@ -77,6 +78,11 @@ const LanguageService = {
   getCorrectCountById(db,word_id){
     return db
       .select('correct_count', 'incorrect_count').from('word').where({'id': word_id}).first()
+  },
+  changeHeadToNext(db, next, user_id){
+    return db('language')
+      .where({'user_id': user_id})
+      .update({'head': next})
   },
 }
 
