@@ -47,59 +47,65 @@ languageRouter
 languageRouter
   .get('/head', async (req, res, next) => {
     try {
-      const response = await LanguageService.getNextWord(
+      const response = await LanguageService.getWordAtHead(
         req.app.get('db'),
-        req.language.id,
         req.user.id,
       )
+      // let score = await LanguageService.getTotalScore(
+      //   req.app.get('db'),
+      //   req.user.id,
+      // )
       res.status(200)
-      res.json(response[0])
+      //TODO: This needs to look at the LANGUAGE table and get the id of the HEAD then go to the WORD table and present the word with that id
+      res.json(response)
     } catch (error) {
       console.log('caught error')
       next(error)
     }
   })
 
-
-
-// using word_id: 18, hoodie, capucha as test input
 languageRouter
   .post('/guess', jsonBodyParser, async (req, res, next) => {
 
-    // Expect in req.body "Guess" and "word ID"
-    //Verifies that there is a guess in the request body
+    // Expect in req.body "Guess" and "word ID" and "original"
+    // Verifies that there is a guess in the request body
     if (!req.body.guess) {
       res.status(400).json({ error: `Missing 'guess' in request body` }).end()
     }
     else if (req.body.guess && req.body.word_id) {
       try {
-        const listItems = await LanguageService.getLanguageWords(
+        // TODO: get the word that matches the id and assign it to a local variable to compare
+        const wordAtHead = await LanguageService.getLanguageWords(
           req.app.get('db'),
-          req.language.id,
+          req.body.word_id,
         )
-        let listOfWords = new LinkedList.LinkedList();
-        for (let i = 0; i < listItems.length; i++) {
-          listOfWords.insertFirst(listItems[i]);
-        }
-        // find in the linked list (word ID)
-        let correctAnswer = listOfWords.find('original', req.body.original);
-        let userAnswer = req.body.guess;
-        // Compare this to the correct value in the database
+
+        // Actions to take on a correct guess
         if (correctAnswer.translation === userAnswer.toLowerCase()) {
-          // update correct and incorrect
-          // Update the total sore for an increase of 1
+
+          // correct_count++
+          // total_score ++
+          // memory_value = memory_value + memory_value
+          
+
+          // sort local list by memory_value
+          // updating the "next" property.
+          // update the db list "next" values to match the local list
+
           const correctTotalScore = await LanguageService.updateTotalScoreCorrect(
             req.app.get('db'),
             req.language.id
           )
+          //updated the correct count AND memory Value
           const correctCountIncrease = await LanguageService.updateCorrectCount(
             req.app.get('db'),
             req.body.word_id
           )
+
           res.status(200)
           res.json({ message: 'this is correct' })
-
-        } else if(correctAnswer.translation !== userAnswer.toLowerCase()){
+        }
+        else if (correctAnswer.translation !== userAnswer.toLowerCase()) {
 
           const inCorrectTotalScore = await LanguageService.updateTotalScoreIncorrect(
             req.app.get('db'),
