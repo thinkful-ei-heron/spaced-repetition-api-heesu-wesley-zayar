@@ -42,14 +42,20 @@ const LanguageService = {
   },
   // This is supposed to update the Users Total Score 
   // TODO:  id is being hard coded. Find a way to make that flexible
-  updateTotalScoreCorrect(db, word_id){
-    return db.raw(`UPDATE language SET total_score = total_score + 1 WHERE id = 3;`)
+  updateTotalScoreCorrect(db, language_id){
+    return db.raw(`UPDATE language SET total_score = total_score + 1 WHERE user_id = ? `,[language_id])
+  },  
+  updateTotalScoreIncorrect(db, language_id){
+    return db.raw(`UPDATE language SET total_score = total_score - 1 WHERE user_id = ? `,[language_id])
   },
   // Updating the correct count on the words table
-  //TODO id is still hardcoded
-  updateCorrectCount(db){
-    return db.raw(`UPDATE word SET correct_count = correct_count + 1 , memory_value = memory_value + memory_value WHERE id = 3;`)
-  }
+  //TODO id is still hard coded
+  updateCorrectCount(db, word_id){
+    return db.raw(`UPDATE word SET correct_count = correct_count + 1 , memory_value = memory_value + memory_value WHERE id = ?`,[word_id])
+  },
+  updateIncorrectCount(db, word_id){
+    return db.raw(`UPDATE word SET incorrect_count = incorrect_count - 1 , memory_value = 1 WHERE id = ?`,[word_id])
+  },
 }
 
 module.exports = LanguageService

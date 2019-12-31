@@ -86,21 +86,32 @@ languageRouter
         let userAnswer = req.body.guess;
         // Compare this to the correct value in the database
         if (correctAnswer.translation === userAnswer.toLowerCase()) {
-          console.log('thats correct!')
+          // update correct and incorrect
+          // Update the total sore for an increase of 1
           const correctTotalScore = await LanguageService.updateTotalScoreCorrect(
             req.app.get('db'),
+            req.language.id
           )
           const correctCountIncrease = await LanguageService.updateCorrectCount(
             req.app.get('db'),
+            req.body.word_id
           )
           res.status(200)
-          res.json({message: 'this is correct'})
+          res.json({ message: 'this is correct' })
+
+        } else if(correctAnswer.translation !== userAnswer.toLowerCase()){
+
+          const inCorrectTotalScore = await LanguageService.updateTotalScoreIncorrect(
+            req.app.get('db'),
+            req.language.id
+          )
+          const inCorrectCountIncrease = await LanguageService.updateIncorrectCount(
+            req.app.get('db'),
+            req.body.word_id
+          )
+          res.status(200)
+          res.json({ message: 'this is Incorrect' })
         }
-
-        // update correct and incorrect
-        // update total
-        // response 
-
       } catch (error) {
         next(error)
       }
