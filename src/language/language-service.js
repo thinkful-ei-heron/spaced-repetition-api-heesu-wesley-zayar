@@ -28,18 +28,56 @@ const LanguageService = {
       )
       .where({ language_id })
   },
-  getNextWord(db, language_id, user_id){
-    return db       
-      .select(
-      'original as nextWord',
-      'total_score as totalScore',
-      'correct_count as wordCorrectCount',
-      'incorrect_count as wordIncorrectCount'
-      )
-      .from('word')
-      .join('language', `word.language_id` , '=', `language.user_id`)
-      .where({language_id: user_id})
-  }
+    getWordAtHead(db,user_id){
+      let head = db.select('head')
+        .from('language')
+        .where({'user_id': user_id})
+      return db
+        .select(
+          'original AS nextWord',
+          'total_score AS totalScore',
+          'correct_count AS wordCorrectCount',
+          'incorrect_count AS wordIncorrectCount',
+        )
+        .from('word')
+        .join('language', `word.language_id` , '=', `language.user_id`)
+        .where({language_id: user_id, 'word.id': head})
+        .first()
+    },
+      getWordById(db,word_id){
+        return db
+          .select(
+            'id',
+            'original',
+            'translation'
+          )
+          .from('word')
+          .where({id: word_id})
+          .first()
+      },
+
+  // This is supposed to update the Users Total Score 
+  updateTotalScoreCorrect(db, language_id){
+    return db.raw(`UPDATE language SET total_score = total_score + 1 WHERE user_id = ? `,[language_id])
+  },  
+  updateTotalScoreIncorrect(db, language_id){
+    return db.raw(`UPDATE language SET total_score = total_score - 1 WHERE user_id = ? `,[language_id])
+  },
+  // Updating the correct count and memory value on the words table
+  updateCorrectCount(db, word_id){
+    return db.raw(`UPDATE word SET correct_count = correct_count + 1 , memory_value = memory_value + memory_value WHERE id = ?`,[word_id])
+  },
+  updateIncorrectCount(db, word_id){
+    return db.raw(`UPDATE word SET incorrect_count = incorrect_count + 1 , memory_value = 1 WHERE id = ?`,[word_id])
+  },
+  getTotalScoreById(db,user_id){
+    return db
+      .select('total_score').from('language').where({'user_id': user_id}).first()
+  },
+  getCorrectCountById(db,word_id){
+    return db
+      .select('correct_count', 'incorrect_count').from('word').where({'id': word_id}).first()
+  },
 }
 
 module.exports = LanguageService

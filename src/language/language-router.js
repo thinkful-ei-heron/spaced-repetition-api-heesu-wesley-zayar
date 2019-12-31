@@ -27,7 +27,7 @@ languageRouter
     }
   })
 
-  languageRouter
+languageRouter
   .get('/', async (req, res, next) => {
     try {
       const words = await LanguageService.getLanguageWords(
@@ -44,59 +44,79 @@ languageRouter
     }
   })
 
-  languageRouter
-    .get('/head', async (req, res, next) => {
-      try {
-        const response = await LanguageService.getNextWord(
-          req.app.get('db'),
-          req.language.id,
-          req.user.id,
-        )
-        res.status(200)
-        res.json(response[0])
-      } catch(error) {
-        console.log('caught error')
-        next(error)
-      }
+languageRouter
+  .get('/head', async (req, res, next) => {
+    try {
+      const response = await LanguageService.getWordAtHead(
+        req.app.get('db'),
+        req.user.id,
+      )
+      res.status(200)
+      res.json(response)
+    } catch (error) {
+      console.log('caught error')
+      next(error)
+    }
   })
 
-
-
-
 languageRouter
-  .post('/guess',jsonBodyParser, async (req, res, next) => {
-      function displayList(list){
-        let currNode = list.head;
-        while (currNode !== null) {
-            console.log(currNode.value.translation);
-            currNode = currNode.next;
-        }
+  .post('/guess', jsonBodyParser, async (req, res, next) => {
+    if (!req.body.guess) {
+      res.status(400).json({ error: `Missing 'guess' in request body` }).end()
     }
-    // Expect in req.body "Guess" and "word ID"
-    //Verifies that there is a guess in the request body
-    if(!req.body.guess){
-      res.status(400).json({ error: `Missing 'guess' in request body`}).end() 
-    }
-    else if(req.body.guess){
+    else if (req.body.guess && req.body.word_id) {
       try {
-        const listItems = await LanguageService.getLanguageWords(
-        req.app.get('db'),
-        req.language.id,
-      )
-      let listOfWords = new LinkedList();
-      for(let i = 1; i < listItems.length + 1; i++){
-          listOfWords.insertFirst(listItems[i]);
-      }
-      // find in the linked list (word ID)
-      // Compare that word Id's translation to req.body.guess
-      // update correct and incorrect
-      // update total
-      // response 
-
-      } catch(error){
+        const wordToCheck = await LanguageService.getWordById(
+          req.app.get('db'),
+          req.body.word_id,
+        )
+        // Actions to take on a correct guess
+        if (wordToCheck.translation === req.body.guess.toLowerCase()) {
+          const correctTotalScore = await LanguageService.updateTotalScoreCorrect(
+            req.app.get('db'),
+            req.language.id
+          )
+          const getTotalScore = await LanguageService.getTotalScoreById(
+            req.app.get('db'),
+            req.user.id
+          )
+          let totalScore = getTotalScore.total_score;
+          // This function also handles the memoryValue doubling.
+          const correctCountIncrease = await LanguageService.updateCorrectCount(
+            req.app.get('db'),
+            req.body.word_id
+          )
+          const getCorrectCount = await LanguageService.getCorrectCountById(
+            req.app.get('db'),
+            req.body.word_id
+          )
+          let correctCount = getCorrectCount.correct_count;
+          let incorrectCount = getCorrectCount.incorrect_count;
+          let output = {
+            'totalScore': totalScore,
+            'correctCount': correctCount,
+            'incorrectCount': incorrectCount
+          }
+          res.status(200)
+          res.json(output)
+        }
+        else if (wordToCheck.translation !== req.body.guess.toLowerCase()) {
+          const inCorrectTotalScore = await LanguageService.updateTotalScoreIncorrect(
+            req.app.get('db'),
+            req.user.id
+          )
+          const inCorrectCountIncrease = await LanguageService.updateIncorrectCount(
+            req.app.get('db'),
+            req.body.word_id
+          )
+          
+          res.status(200)
+          res.json({ message: 'this is Incorrect' })
+        }
+      } catch (error) {
         next(error)
       }
-      
+
     }
   })
 
