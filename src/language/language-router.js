@@ -101,40 +101,60 @@ languageRouter
             req.app.get('db'),
             req.user.id
           )
-          const test = await LanguageService.findWordAtPosition(
-            req.app.get('db'),
-            req.user.id
-          );
 
-          console.log('updated value', wordToCheck.memory_value);
-
-          async function findWordAtPosition(mv, start) {
-            let counter = mv;
-            let nextWord = await LanguageService.getWordById(
-              req.app.get('db'),
-              start.id
-            )
-            let i = 0;
-            while (i < counter) {
-              if(!nextWord.next){
-                return nextWord;
-              }
-              nextWord = await LanguageService.getWordById(
+          async function moveWordToPosition(mv, start) {
+            try {
+              let counter = mv;
+              let originalWord = await LanguageService.getWordById(
                 req.app.get('db'),
-                nextWord.next
+                start.id
               )
-              i++;
+              let insertAfter = await LanguageService.getWordById(
+                req.app.get('db'),
+                start.id
+              )
+              let i = 0;
+              while (i < counter + 1 ) {
+                if (!insertAfter.next) {
+                  return insertAfter;
+                }
+                insertAfter = await LanguageService.getWordById(
+                  req.app.get('db'),
+                  insertAfter.next
+                )
+                i++;
+              }
+
+              // newNode.next = node.next; 
+              // node.next = newNode;
+              let tempNext = insertAfter.next
+              // originalWord.next = tempNext
+              insertAfter.next  = originalWord.id
+              const change01 = await LanguageService.changeNextOfWord(
+                req.app.get('db'),
+                originalWord.id,
+                tempNext
+              )
+              const change02 = await LanguageService.changeNextOfWord(
+                req.app.get('db'),
+                insertAfter.id,
+                originalWord.id
+              )
+            } catch (error) {
+              console.log(error);
+              return error;
             }
-            return nextWord
+
           }
 
-          console.log(findWordAtPosition(wordToCheck.memory_value, wordToCheck))
+          let test01 = await moveWordToPosition(wordToCheck.memory_value, wordToCheck);
+          //console.log(test01);
 
-          // const changeHead = await LanguageService.changeHeadToNext(
-          //   req.app.get('db'),
-          //   wordToCheck.next,
-          //   req.user.id
-          // )
+          const changeHead = await LanguageService.changeHeadToNext(
+            req.app.get('db'),
+            wordToCheck.next,
+            req.user.id
+          )
           let outputCorrectGuess = {
             'nextWord': updatedHead.nextWord,
             'wordCorrectCount': correctCount,

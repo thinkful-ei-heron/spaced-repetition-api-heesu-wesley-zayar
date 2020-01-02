@@ -85,23 +85,28 @@ const LanguageService = {
       .where({ 'user_id': user_id })
       .update({ 'head': next })
   },
-  findWordAtPosition(db, user_id) {
-    let currNode = db.select('head')
-      .from('language')
-      .where({ 'user_id': user_id })
-    let userWords = db
-      .select(
-        'word.id',
-        'translation',
-        'memory_value',
-        'head',
-        'next'
-      )
-      .from('word')
-      .join('language', `word.language_id`, '=', `language.user_id`)
-      .where({ language_id: user_id })
-    return userWords;
+  changeNextOfWord(db, word_id, next){
+    return db('word')
+      .where({'id': word_id})
+      .update({'next': next})
   }
+  // findWordAtPosition(db, user_id) {
+  //   let currNode = db.select('head')
+  //     .from('language')
+  //     .where({ 'user_id': user_id })
+  //   let userWords = db
+  //     .select(
+  //       'word.id',
+  //       'translation',
+  //       'memory_value',
+  //       'head',
+  //       'next'
+  //     )
+  //     .from('word')
+  //     .join('language', `word.language_id`, '=', `language.user_id`)
+  //     .where({ language_id: user_id })
+  //   return userWords;
+  // }
 }
 
 module.exports = LanguageService
