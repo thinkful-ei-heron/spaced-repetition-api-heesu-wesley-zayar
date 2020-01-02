@@ -64,9 +64,9 @@ languageRouter
     if (!req.body.guess) {
       res.status(400).json({ error: `Missing 'guess' in request body` }).end()
     }
-    if(!req.body.word_id){
-      res.status(400).json({ error: `Missing 'word_id' in request body` }).end()
-    }
+    // if(!req.body.word_id){
+    //   res.status(400).json({ error: `Missing 'word_id' in request body` }).end()
+    // }
 
     else if (req.body.guess && req.body.word_id) {
       try {
@@ -97,22 +97,64 @@ languageRouter
           let correctCount = getCorrectCount.correct_count;
           let incorrectCount = getCorrectCount.incorrect_count;
 
+          const updatedHead = await LanguageService.getWordAtHead(
+            req.app.get('db'),
+            req.user.id
+          )
+
+          async function moveWordToPosition(mv, start) {
+            try {
+              let counter = mv;
+              let originalWord = await LanguageService.getWordById(
+                req.app.get('db'),
+                start.id
+              )
+              let insertAfter = await LanguageService.getWordById(
+                req.app.get('db'),
+                start.id
+              )
+              let i = 0;
+              while (i < counter + 1 ) {
+                if (!insertAfter.next) {
+                  return insertAfter;
+                }
+                insertAfter = await LanguageService.getWordById(
+                  req.app.get('db'),
+                  insertAfter.next
+                )
+                i++;
+              }
+
+              // newNode.next = node.next; 
+              // node.next = newNode;
+              let tempNext = insertAfter.next
+              // originalWord.next = tempNext
+              insertAfter.next  = originalWord.id
+              const change01 = await LanguageService.changeNextOfWord(
+                req.app.get('db'),
+                originalWord.id,
+                tempNext
+              )
+              const change02 = await LanguageService.changeNextOfWord(
+                req.app.get('db'),
+                insertAfter.id,
+                originalWord.id
+              )
+            } catch (error) {
+              console.log(error);
+              return error;
+            }
+
+          }
+
+          let test01 = await moveWordToPosition(wordToCheck.memory_value, wordToCheck);
+          //console.log(test01);
 
           const changeHead = await LanguageService.changeHeadToNext(
             req.app.get('db'),
             wordToCheck.next,
             req.user.id
           )
-          const updatedHead = await LanguageService.getWordAtHead(
-            req.app.get('db'),
-            req.user.id
-          )
-            console.log(updatedHead);
-
-
-            // head = wordById next
-
-
           let outputCorrectGuess = {
             'nextWord': updatedHead.nextWord,
             'wordCorrectCount': correctCount,
@@ -122,7 +164,7 @@ languageRouter
             'isCorrect': true
           }
           res.status(200)
-          res.json(outputCorrectGuess)
+          res.json(outputCorrectGuess).end()
         }
         //Actions to take on an Incorrect guess
         else if (wordToCheck.translation !== req.body.guess.toLowerCase()) {
