@@ -64,9 +64,9 @@ languageRouter
     if (!req.body.guess) {
       res.status(400).json({ error: `Missing 'guess' in request body` }).end()
     }
-    if(!req.body.word_id){
-      res.status(400).json({ error: `Missing 'word_id' in request body` }).end()
-    }
+    // if(!req.body.word_id){
+    //   res.status(400).json({ error: `Missing 'word_id' in request body` }).end()
+    // }
 
     else if (req.body.guess && req.body.word_id) {
       try {
@@ -97,22 +97,44 @@ languageRouter
           let correctCount = getCorrectCount.correct_count;
           let incorrectCount = getCorrectCount.incorrect_count;
 
-
-          const changeHead = await LanguageService.changeHeadToNext(
-            req.app.get('db'),
-            wordToCheck.next,
-            req.user.id
-          )
           const updatedHead = await LanguageService.getWordAtHead(
             req.app.get('db'),
             req.user.id
           )
-            console.log(updatedHead);
+          const test = await LanguageService.findWordAtPosition(
+            req.app.get('db'),
+            req.user.id
+          );
 
+          console.log('updated value', wordToCheck.memory_value);
 
-            // head = wordById next
+          async function findWordAtPosition(mv, start) {
+            let counter = mv;
+            let nextWord = await LanguageService.getWordById(
+              req.app.get('db'),
+              start.id
+            )
+            let i = 0;
+            while (i < counter) {
+              if(!nextWord.next){
+                return nextWord;
+              }
+              nextWord = await LanguageService.getWordById(
+                req.app.get('db'),
+                nextWord.next
+              )
+              i++;
+            }
+            return nextWord
+          }
 
+          console.log(findWordAtPosition(wordToCheck.memory_value, wordToCheck))
 
+          // const changeHead = await LanguageService.changeHeadToNext(
+          //   req.app.get('db'),
+          //   wordToCheck.next,
+          //   req.user.id
+          // )
           let outputCorrectGuess = {
             'nextWord': updatedHead.nextWord,
             'wordCorrectCount': correctCount,
@@ -122,7 +144,7 @@ languageRouter
             'isCorrect': true
           }
           res.status(200)
-          res.json(outputCorrectGuess)
+          res.json(outputCorrectGuess).end()
         }
         //Actions to take on an Incorrect guess
         else if (wordToCheck.translation !== req.body.guess.toLowerCase()) {
