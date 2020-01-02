@@ -172,6 +172,7 @@ describe.only('Language Endpoints', function () {
     context(`Given incorrect guess`, () => {
       const incorrectPostBody = {
         guess: 'incorrect',
+        'word_id':'1'
       }
 
       it(`responds with incorrect and moves head`, () => {
@@ -219,6 +220,7 @@ describe.only('Language Endpoints', function () {
       it(`responds with correct and moves head`, () => {
         const correctPostBody = {
           guess: testLanguagesWords[0].translation,
+          'word_id':'1'
         }
         console.log('correct post body',correctPostBody);
         return supertest(app)
@@ -239,6 +241,7 @@ describe.only('Language Endpoints', function () {
       it(`moves the word 2 spaces, increases score and correct count`, async () => {
         let correctPostBody = {
           guess: testLanguagesWords[0].translation,
+          'word_id':'1'
         }
         await supertest(app)
           .post(`/api/language/guess`)
@@ -263,6 +266,7 @@ describe.only('Language Endpoints', function () {
 
         correctPostBody = {
           guess: testLanguagesWords[2].translation,
+          'word_id':'1'
         }
         await supertest(app)
           .post(`/api/language/guess`)

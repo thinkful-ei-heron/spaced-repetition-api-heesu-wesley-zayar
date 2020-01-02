@@ -2,7 +2,6 @@ const express = require('express')
 const LanguageService = require('./language-service')
 const { requireAuth } = require('../middleware/jwt-auth')
 const jsonBodyParser = express.json()
-const LinkedList = require('../util/linkedListClass');
 
 const languageRouter = express.Router()
 
@@ -52,9 +51,8 @@ languageRouter
         req.user.id,
       )
       res.status(200)
-      res.json(response)
+      res.json(response).done()
     } catch (error) {
-      console.log('caught error')
       next(error)
     }
   })
@@ -62,11 +60,8 @@ languageRouter
 languageRouter
   .post('/guess', jsonBodyParser, async (req, res, next) => {
     if (!req.body.guess) {
-      res.status(400).json({ error: `Missing 'guess' in request body` }).end()
+      res.status(400).json({ error: `Missing 'guess' in request body` })
     }
-    // if(!req.body.word_id){
-    //   res.status(400).json({ error: `Missing 'word_id' in request body` }).end()
-    // }
 
     else if (req.body.guess && req.body.word_id) {
       try {
@@ -102,7 +97,7 @@ languageRouter
             req.user.id
           )
 
-          async function moveWordToPosition(mv, start) {
+          const moveWordToPosition = async function (mv, start) {
             try {
               let counter = mv;
               let originalWord = await LanguageService.getWordById(
@@ -114,7 +109,7 @@ languageRouter
                 start.id
               )
               let i = 0;
-              while (i < counter + 1 ) {
+              while (i < counter + 1) {
                 if (!insertAfter.next) {
                   return insertAfter;
                 }
@@ -124,12 +119,8 @@ languageRouter
                 )
                 i++;
               }
-
-              // newNode.next = node.next; 
-              // node.next = newNode;
               let tempNext = insertAfter.next
-              // originalWord.next = tempNext
-              insertAfter.next  = originalWord.id
+              insertAfter.next = originalWord.id
               const change01 = await LanguageService.changeNextOfWord(
                 req.app.get('db'),
                 originalWord.id,
@@ -141,14 +132,12 @@ languageRouter
                 originalWord.id
               )
             } catch (error) {
-              console.log(error);
-              return error;
+              next(error);
             }
 
           }
 
-          let test01 = await moveWordToPosition(wordToCheck.memory_value, wordToCheck);
-          //console.log(test01);
+          const move02 = await moveWordToPosition(wordToCheck.memory_value, wordToCheck);
 
           const changeHead = await LanguageService.changeHeadToNext(
             req.app.get('db'),
@@ -164,8 +153,9 @@ languageRouter
             'isCorrect': true
           }
           res.status(200)
-          res.json(outputCorrectGuess).end()
+          res.json(outputCorrectGuess)
         }
+
         //Actions to take on an Incorrect guess
         else if (wordToCheck.translation !== req.body.guess.toLowerCase()) {
           const inCorrectTotalScore = await LanguageService.updateTotalScoreIncorrect(
@@ -188,11 +178,55 @@ languageRouter
           let incorrectCount = getCorrectCount.incorrect_count;
           let totalScore = getTotalScore.total_score;
 
+
+          const moveWordToPosition = async function (mv, start) {
+            try {
+              let counter = mv;
+              let originalWord = await LanguageService.getWordById(
+                req.app.get('db'),
+                start.id
+              )
+              let insertAfter = await LanguageService.getWordById(
+                req.app.get('db'),
+                start.next
+              )
+
+              let tempNext = insertAfter.next
+              insertAfter.next = originalWord.id
+              const change01 = await LanguageService.changeNextOfWord(
+                req.app.get('db'),
+                originalWord.id,
+                tempNext
+              )
+              const change02 = await LanguageService.changeNextOfWord(
+                req.app.get('db'),
+                insertAfter.id,
+                originalWord.id
+              )
+            } catch (error) {
+              console.log(error);
+              next(error);
+            }
+          }
+          const moveWord = await moveWordToPosition(wordToCheck.memory_value, wordToCheck);
+
+          const changeHead = await LanguageService.changeHeadToNext(
+            req.app.get('db'),
+            wordToCheck.next,
+            req.user.id
+          )
+          const updatedHead = await LanguageService.getWordAtHead(
+            req.app.get('db'),
+            req.user.id
+          )
+          if(totalScore < 0){
+            totalScore = 0
+            }
           let outputIncorrectGuess = {
-            'nextWord': null,
-            'wordCorrectCount': correctCount,
-            'incorrectCount': incorrectCount,
+            'nextWord': updatedHead.nextWord,
             'totalScore': totalScore,
+            'wordCorrectCount': correctCount,
+            'wordIncorrectCount': incorrectCount,
             'answer': wordToCheck.translation,
             'isCorrect': false
           }
@@ -202,8 +236,25 @@ languageRouter
       } catch (error) {
         next(error)
       }
-
     }
   })
 
 module.exports = languageRouter
+
+
+// expected {
+//   nextWord: 'original 2',
+//   totalScore: 0,
+//   wordCorrectCount: 0,
+//   wordIncorrectCount: 0,
+//   answer: 'translation 1',
+//   isCorrect: false
+// }  
+// got {
+//   nextWord: 'original 2',
+//   totalScore: 0,
+//   wordCorrectCount: 0,
+//   wordIncorrectCount: 1,
+//   answer: 'translation 1',
+//   isCorrect: false
+// }

@@ -72,6 +72,7 @@ const LanguageService = {
   updateIncorrectCount(db, word_id) {
     return db.raw(`UPDATE word SET incorrect_count = incorrect_count + 1 , memory_value = 1 WHERE id = ?`, [word_id])
   },
+  //incorrect_count = incorrect_count + 1 ,
   getTotalScoreById(db, user_id) {
     return db
       .select('total_score').from('language').where({ 'user_id': user_id }).first()
@@ -90,23 +91,6 @@ const LanguageService = {
       .where({'id': word_id})
       .update({'next': next})
   }
-  // findWordAtPosition(db, user_id) {
-  //   let currNode = db.select('head')
-  //     .from('language')
-  //     .where({ 'user_id': user_id })
-  //   let userWords = db
-  //     .select(
-  //       'word.id',
-  //       'translation',
-  //       'memory_value',
-  //       'head',
-  //       'next'
-  //     )
-  //     .from('word')
-  //     .join('language', `word.language_id`, '=', `language.user_id`)
-  //     .where({ language_id: user_id })
-  //   return userWords;
-  // }
 }
 
 module.exports = LanguageService
