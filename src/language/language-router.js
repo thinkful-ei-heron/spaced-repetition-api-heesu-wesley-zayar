@@ -89,8 +89,12 @@ languageRouter
             req.app.get('db'),
             req.body.word_id
           )
+          const getIncorrectCount = await LanguageService.getIncorrectCountById(
+            req.app.get('db'),
+            req.body.word_id
+          )
           let correctCount = getCorrectCount.correct_count;
-          let incorrectCount = getCorrectCount.incorrect_count;
+          let incorrectCount = getIncorrectCount.incorrect_count;
 
           const updatedHead = await LanguageService.getWordAtHead(
             req.app.get('db'),
@@ -119,6 +123,7 @@ languageRouter
                 )
                 i++;
               }
+
               let tempNext = insertAfter.next
               insertAfter.next = originalWord.id
               const change01 = await LanguageService.changeNextOfWord(
@@ -147,7 +152,7 @@ languageRouter
           let outputCorrectGuess = {
             'nextWord': updatedHead.nextWord,
             'wordCorrectCount': correctCount,
-            'incorrectCount': incorrectCount,
+            'wordIncorrectCount': incorrectCount,
             'totalScore': totalScore,
             'answer': wordToCheck.translation,
             'isCorrect': true
@@ -174,8 +179,12 @@ languageRouter
             req.app.get('db'),
             req.body.word_id
           )
+          const getIncorrectCount = await LanguageService.getIncorrectCountById(
+            req.app.get('db'),
+            req.body.word_id
+          )
           let correctCount = getCorrectCount.correct_count;
-          let incorrectCount = getCorrectCount.incorrect_count;
+          let incorrectCount = getIncorrectCount.incorrect_count;
           let totalScore = getTotalScore.total_score;
 
 

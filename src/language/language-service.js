@@ -58,7 +58,7 @@ const LanguageService = {
       .first()
   },
 
-  // This is supposed to update the Users Total Score 
+  // This is supposed to update the Users Total Score
   updateTotalScoreCorrect(db, language_id) {
     return db.raw(`UPDATE language SET total_score = total_score + 1 WHERE user_id = ? `, [language_id])
   },
@@ -79,7 +79,11 @@ const LanguageService = {
   },
   getCorrectCountById(db, word_id) {
     return db
-      .select('correct_count', 'incorrect_count').from('word').where({ 'id': word_id }).first()
+      .select('correct_count').from('word').where({ 'id': word_id }).first()
+  },
+  getIncorrectCountById(db, word_id) {
+    return db
+      .select('incorrect_count').from('word').where({ 'id': word_id }).first()
   },
   changeHeadToNext(db, next, user_id) {
     return db('language')
@@ -94,8 +98,3 @@ const LanguageService = {
 }
 
 module.exports = LanguageService
-
-
-
-
-
