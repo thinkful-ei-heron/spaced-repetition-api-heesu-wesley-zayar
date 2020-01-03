@@ -172,7 +172,6 @@ describe('Language Endpoints', function () {
     context(`Given incorrect guess`, () => {
       const incorrectPostBody = {
         guess: 'incorrect',
-        // I added this to match our DB searches by the unique ID rather than the word
         'word_id': testLanguagesWords[1].id
       }
 
@@ -189,7 +188,6 @@ describe('Language Endpoints', function () {
             nextWord: testLanguagesWords[1].original,
             totalScore: 0,
             wordCorrectCount: 0,
-            // Our function adds the incorrect count before and this is expecting it After ?
             wordIncorrectCount: 1,
             answer: testLanguagesWords[0].translation,
             isCorrect: false
@@ -200,7 +198,6 @@ describe('Language Endpoints', function () {
         await supertest(app)
           .post(`/api/language/guess`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          // Again getting the word ID to pass into the function
           .send({
             guess: 'incorrect',
             'word_id': testLanguagesWords[0].id
@@ -214,7 +211,6 @@ describe('Language Endpoints', function () {
             'word_id': testLanguagesWords[0].id
           })
           .expect({
-            // our shuffle add the word AFTER the memory value position the test were built to look to the BEFORE
             nextWord: testLanguagesWords[2].original,
             totalScore: 0,
             wordCorrectCount: 0,
