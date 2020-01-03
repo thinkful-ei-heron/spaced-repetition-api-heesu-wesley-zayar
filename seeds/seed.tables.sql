@@ -1,4 +1,4 @@
--- psql -U wesleyjacobs -d bugout -f ./seeds/seed.bugout.sql
+-- psql -U wesleyjacobs -d spaced-repetition -f ./seeds/seed.tables.sql
 
 BEGIN;
 
