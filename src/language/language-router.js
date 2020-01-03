@@ -51,7 +51,7 @@ languageRouter
         req.user.id,
       )
       res.status(200)
-      res.json(response).done()
+      res.json(response)
     } catch (error) {
       next(error)
     }
@@ -96,10 +96,7 @@ languageRouter
           let correctCount = getCorrectCount.correct_count;
           let incorrectCount = getIncorrectCount.incorrect_count;
 
-          const updatedHead = await LanguageService.getWordAtHead(
-            req.app.get('db'),
-            req.user.id
-          )
+
 
           const moveWordToPosition = async function (mv, start) {
             try {
@@ -149,6 +146,12 @@ languageRouter
             wordToCheck.next,
             req.user.id
           )
+
+          const updatedHead = await LanguageService.getWordAtHead(
+            req.app.get('db'),
+            req.user.id
+          )
+          
           let outputCorrectGuess = {
             'nextWord': updatedHead.nextWord,
             'wordCorrectCount': correctCount,

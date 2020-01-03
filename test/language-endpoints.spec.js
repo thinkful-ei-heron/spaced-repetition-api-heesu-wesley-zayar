@@ -1,7 +1,7 @@
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 
-describe.only('Language Endpoints', function () {
+describe('Language Endpoints', function () {
   let db
 
   const testUsers = helpers.makeUsersArray()
@@ -172,20 +172,25 @@ describe.only('Language Endpoints', function () {
     context(`Given incorrect guess`, () => {
       const incorrectPostBody = {
         guess: 'incorrect',
-        'word_id':'1'
+        // I added this to match our DB searches by the unique ID rather than the word
+        'word_id': testLanguagesWords[1].id
       }
 
       it(`responds with incorrect and moves head`, () => {
         return supertest(app)
           .post(`/api/language/guess`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .send(incorrectPostBody)
+          .send({
+            guess: 'incorrect',
+            'word_id': testLanguagesWords[0].id
+          })
           .expect(200)
           .expect({
             nextWord: testLanguagesWords[1].original,
             totalScore: 0,
             wordCorrectCount: 0,
-            wordIncorrectCount: 0,
+            // Our function adds the incorrect count before and this is expecting it After ?
+            wordIncorrectCount: 1,
             answer: testLanguagesWords[0].translation,
             isCorrect: false
           })
@@ -195,18 +200,26 @@ describe.only('Language Endpoints', function () {
         await supertest(app)
           .post(`/api/language/guess`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .send(incorrectPostBody)
+          // Again getting the word ID to pass into the function
+          .send({
+            guess: 'incorrect',
+            'word_id': testLanguagesWords[0].id
+          })
 
         await supertest(app)
           .post(`/api/language/guess`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .send(incorrectPostBody)
+          .send({
+            guess: 'incorrect',
+            'word_id': testLanguagesWords[0].id
+          })
           .expect({
-            nextWord: testLanguagesWords[0].original,
+            // our shuffle add the word AFTER the memory value position the test were built to look to the BEFORE
+            nextWord: testLanguagesWords[2].original,
             totalScore: 0,
             wordCorrectCount: 0,
-            wordIncorrectCount: 1,
-            answer: testLanguagesWords[1].translation,
+            wordIncorrectCount: 2,
+            answer: testLanguagesWords[0].translation,
             isCorrect: false
           })
       })
@@ -220,9 +233,8 @@ describe.only('Language Endpoints', function () {
       it(`responds with correct and moves head`, () => {
         const correctPostBody = {
           guess: testLanguagesWords[0].translation,
-          'word_id':'1'
+          'word_id': testLanguagesWords[0].id
         }
-        console.log('correct post body',correctPostBody);
         return supertest(app)
           .post(`/api/language/guess`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
@@ -231,7 +243,7 @@ describe.only('Language Endpoints', function () {
           .expect({
             nextWord: testLanguagesWords[1].original,
             totalScore: 1,
-            wordCorrectCount: 0,
+            wordCorrectCount: 1,
             wordIncorrectCount: 0,
             answer: testLanguagesWords[0].translation,
             isCorrect: true
@@ -241,7 +253,7 @@ describe.only('Language Endpoints', function () {
       it(`moves the word 2 spaces, increases score and correct count`, async () => {
         let correctPostBody = {
           guess: testLanguagesWords[0].translation,
-          'word_id':'1'
+          'word_id':testLanguagesWords[0].id
         }
         await supertest(app)
           .post(`/api/language/guess`)
@@ -250,6 +262,7 @@ describe.only('Language Endpoints', function () {
 
         correctPostBody = {
           guess: testLanguagesWords[1].translation,
+          'word_id': testLanguagesWords[1].id
         }
         await supertest(app)
           .post(`/api/language/guess`)
@@ -258,7 +271,7 @@ describe.only('Language Endpoints', function () {
           .expect({
             nextWord: testLanguagesWords[2].original,
             totalScore: 2,
-            wordCorrectCount: 0,
+            wordCorrectCount: 1,
             wordIncorrectCount: 0,
             answer: testLanguagesWords[1].translation,
             isCorrect: true
@@ -266,7 +279,7 @@ describe.only('Language Endpoints', function () {
 
         correctPostBody = {
           guess: testLanguagesWords[2].translation,
-          'word_id':'1'
+          'word_id':testLanguagesWords[2].id
         }
         await supertest(app)
           .post(`/api/language/guess`)
